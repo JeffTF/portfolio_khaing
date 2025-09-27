@@ -32,7 +32,8 @@ class AppBarSection extends StatelessWidget implements PreferredSizeWidget {
 
     return AppBar(
       elevation: 0,
-      backgroundColor: theme.scaffoldBackgroundColor.withOpacity(0.9),
+      backgroundColor: Colors.transparent,
+      //backgroundColor: theme.scaffoldBackgroundColor.withOpacity(0.9),
       systemOverlayStyle: theme.brightness == Brightness.light
           ? SystemUiOverlayStyle.dark
           : SystemUiOverlayStyle.light,

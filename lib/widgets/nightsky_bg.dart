@@ -12,10 +12,12 @@ class StarryNightScreen extends StatefulWidget {
 class _StarryNightScreenState extends State<StarryNightScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _blinkAnimation;
   final Random random = Random();
   final int numStars = 150;
   final List<Offset> stars = [];
   final List<double> starSizes = [];
+  final List<double> starBlinkOffsets = [];
 
   @override
   void initState() {
@@ -24,20 +26,22 @@ class _StarryNightScreenState extends State<StarryNightScreen>
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 4),
-    )..repeat();
+    )..repeat(reverse: true);
+
+    _blinkAnimation = Tween<double>(begin: 0.3, end: 1.0)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
     // Generate star positions once
     for (int i = 0; i < numStars; i++) {
-      stars.add(Offset(
-          random.nextDouble() *
-              MediaQueryData.fromWindow(WidgetsBinding.instance.window)
-                  .size
-                  .width,
-          random.nextDouble() *
-              MediaQueryData.fromWindow(WidgetsBinding.instance.window)
-                  .size
-                  .height));
+      final screenWidth =
+          MediaQueryData.fromView(WidgetsBinding.instance.window).size.width;
+      final screenHeight =
+          MediaQueryData.fromView(WidgetsBinding.instance.window).size.height;
+      stars.add(Offset(random.nextDouble() * screenWidth,
+          random.nextDouble() * screenHeight));
       starSizes.add(random.nextDouble() * 1.5 + 0.5);
+      starBlinkOffsets.add(random.nextDouble());
+      setState(() {});
     }
   }
 
@@ -65,11 +69,19 @@ class _StarryNightScreenState extends State<StarryNightScreen>
                 end: Alignment.bottomCenter,
               ),
             ),
-            child: CustomPaint(
-              painter:
-                  StarrySkyPainter(starPositions: stars, starSizes: starSizes),
-              child: Container(),
-            ),
+            child: AnimatedBuilder(
+                animation: _blinkAnimation,
+                builder: (context, child) {
+                  return CustomPaint(
+                    painter: StarrySkyPainter(
+                        starPositions: stars,
+                        starSizes: starSizes,
+                        blinkValue: _blinkAnimation.value,
+                        blinkOffsets: starBlinkOffsets,
+                        animationStatus: _controller.status),
+                    child: Container(),
+                  );
+                }),
           ),
           ShootingStarsBackground()
         ],
@@ -81,20 +93,40 @@ class _StarryNightScreenState extends State<StarryNightScreen>
 class StarrySkyPainter extends CustomPainter {
   final List<Offset> starPositions;
   final List<double> starSizes;
+  final double blinkValue;
+  final List<double> blinkOffsets;
+  final AnimationStatus animationStatus;
 
-  StarrySkyPainter({required this.starPositions, required this.starSizes});
+  StarrySkyPainter(
+      {required this.starPositions,
+      required this.starSizes,
+      required this.blinkValue,
+      required this.blinkOffsets,
+      required this.animationStatus});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.white.withOpacity(0.8);
+    final paint = Paint();
+    //..color = Colors.white.withOpacity(0.8);
 
     for (int i = 0; i < starPositions.length; i++) {
       final pos = starPositions[i];
       final radius = starSizes[i];
+      final offSet = blinkOffsets[i];
+      double localBlinkValue = (blinkValue + offSet) % 1.0;
+      if (animationStatus == AnimationStatus.reverse) {
+        localBlinkValue = (1.0 - (blinkValue + offSet)) % 1.0;
+      }
+      final double curvedValue = Curves.easeInOut.transform(localBlinkValue);
+      final double opacity = 0.3 + (curvedValue * 0.7);
+      paint.color = Colors.white.withOpacity(opacity);
       canvas.drawCircle(pos, radius, paint);
     }
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant StarrySkyPainter oldDelegate) {
+    return oldDelegate.blinkValue != blinkValue ||
+        oldDelegate.animationStatus != animationStatus;
+  }
 }

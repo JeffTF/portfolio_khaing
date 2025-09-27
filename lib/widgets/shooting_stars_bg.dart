@@ -26,7 +26,7 @@ class ShootingStarsPainter extends CustomPainter {
     for (final star in stars) {
       paint.shader = LinearGradient(
         colors: [
-          Colors.white.withOpacity(star.opacity),
+          Color(0xFF5CA9FA).withOpacity(star.opacity),
           Colors.purpleAccent.withOpacity(0.0),
         ],
       ).createShader(Rect.fromLTWH(

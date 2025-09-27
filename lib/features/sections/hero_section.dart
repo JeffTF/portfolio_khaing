@@ -5,6 +5,8 @@ import 'package:portfolio_khaing/features/bloc/language_cubit.dart';
 import 'package:portfolio_khaing/widgets/animated_bg_v2.dart';
 import 'package:portfolio_khaing/widgets/nightsky_bg.dart';
 import 'package:portfolio_khaing/widgets/shooting_stars_bg.dart';
+import 'package:portfolio_khaing/widgets/rainy_window.dart';
+import 'package:portfolio_khaing/widgets/sunny_day_bg.dart';
 import '../../language/lang.dart';
 import '../../widgets/animated_background.dart';
 import '../../widgets/custom_button.dart';
@@ -33,9 +35,13 @@ class HeroSection extends StatelessWidget {
           height: screenSize.height,
           child: Stack(
             children: [
-              StarryNightScreen(),
-              // AnimatedBackgroundV2(),
-              // ShootingStarsBackground(),
+              // theme.brightness == Brightness.light
+              //     ? RainyWindow()
+              //     //? ShootingStarsBackground()
+              //     : StarryNightScreen(),
+              //StarryNightScreen(),
+              //AnimatedBackgroundV2(),
+              //ShootingStarsBackground(),
               //AnimatedBackground(color: theme.colorScheme.primary),
               Center(
                 child: Padding(

@@ -16,7 +16,7 @@ class ContactSection extends StatelessWidget {
       height: screenSize.height,
       child: Stack(children: [
         // AnimatedBackground(color: theme.colorScheme.primary),
-        AnimatedBackgroundV2(),
+        //AnimatedBackgroundV2(),
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(

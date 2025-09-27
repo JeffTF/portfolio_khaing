@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:portfolio_khaing/widgets/nightsky_bg.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../widgets/rainy_window.dart';
 import '../bloc/language_cubit.dart';
 import '../sections/app_bar.dart';
 import '../sections/contact_section.dart';
@@ -84,28 +86,46 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  // void _updateCurrentSection() {
+  //   final viewportHeight = MediaQuery.of(context).size.height - kToolbarHeight;
+  //   final scrollOffset = _scrollController.offset;
+  //   final viewportMiddle = scrollOffset + (viewportHeight / 2);
+
+  //   for (int i = 0; i < _sectionKeys.length; i++) {
+  //     final sectionKey = _sectionKeys[i];
+  //     final sectionContext = sectionKey.currentContext;
+
+  //     if (sectionContext != null) {
+  //       final RenderBox box = sectionContext.findRenderObject() as RenderBox;
+  //       final sectionPosition = box.localToGlobal(Offset.zero).dy;
+  //       final sectionHeight = box.size.height;
+
+  //       if (viewportMiddle >= sectionPosition &&
+  //           viewportMiddle < sectionPosition + sectionHeight) {
+  //         if (_currentSection != i) {
+  //           setState(() => _currentSection = i);
+  //         }
+  //         break;
+  //       }
+  //     }
+  //   }
+  // }
   void _updateCurrentSection() {
-    final viewportHeight = MediaQuery.of(context).size.height;
-    final scrollOffset = _scrollController.offset;
-    final viewportMiddle = scrollOffset + (viewportHeight / 2);
+    final sectionHeight = MediaQuery.of(context).size.height - kToolbarHeight;
 
-    for (int i = 0; i < _sectionKeys.length; i++) {
-      final sectionKey = _sectionKeys[i];
-      final sectionContext = sectionKey.currentContext;
+    if (sectionHeight <= 0) return;
 
-      if (sectionContext != null) {
-        final RenderBox box = sectionContext.findRenderObject() as RenderBox;
-        final sectionPosition = box.localToGlobal(Offset.zero).dy;
-        final sectionHeight = box.size.height;
+    final currentVisibleSection =
+        (_scrollController.offset + 100) / sectionHeight;
 
-        if (viewportMiddle >= sectionPosition &&
-            viewportMiddle < sectionPosition + sectionHeight) {
-          if (_currentSection != i) {
-            setState(() => _currentSection = i);
-          }
-          break;
-        }
-      }
+    int newSection = currentVisibleSection.floor();
+
+    newSection = newSection.clamp(0, _sectionKeys.length - 1);
+
+    if (_currentSection != newSection) {
+      setState(() {
+        _currentSection = newSection;
+      });
     }
   }
 
@@ -130,54 +150,65 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
     final isMobile = screenSize.width < 768;
+    final theme = Theme.of(context);
 
-    return Scaffold(
-      appBar: AppBarSection(
-        isMobile: isMobile,
-        currentSection: _currentSection,
-        toggleTheme: widget.toggleTheme,
-        scrollToSection: _scrollToSection,
-        toggleMobileMenu: () =>
-            setState(() => _isMobileMenuOpen = !_isMobileMenuOpen),
-        isMobileMenuOpen: _isMobileMenuOpen,
-      ),
-      body: SingleChildScrollView(
-        controller: _scrollController,
-        physics: const BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            SizedBox(
-              key: _sectionKeys[0],
-              height: screenSize.height - kToolbarHeight,
-              child: HeroSection(
-                isMobile: isMobile,
-                scrollToSection: _scrollToSection,
-              ),
-            ),
-            SizedBox(
-                key: _sectionKeys[1],
-                height: screenSize.height - kToolbarHeight,
-                child: Center(child: Text('About Section'))),
-            SizedBox(
-              key: _sectionKeys[2],
-              height: screenSize.height - kToolbarHeight,
-              child: Center(child: Text('Skills Section')),
-            ),
-            SizedBox(
-              key: _sectionKeys[3],
-              height: screenSize.height - kToolbarHeight,
-              child: Center(child: Text('Project Section')),
-            ),
-            SizedBox(
-                key: _sectionKeys[4],
-                height: screenSize.height - kToolbarHeight,
-                child: ContactSection(
-                  isMobile: isMobile,
-                )),
-          ],
+    return Stack(children: [
+      theme.brightness == Brightness.light
+          ? RainyWindow()
+          : StarryNightScreen(),
+      Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBarSection(
+          isMobile: isMobile,
+          currentSection: _currentSection,
+          toggleTheme: widget.toggleTheme,
+          scrollToSection: _scrollToSection,
+          toggleMobileMenu: () =>
+              setState(() => _isMobileMenuOpen = !_isMobileMenuOpen),
+          isMobileMenuOpen: _isMobileMenuOpen,
         ),
+        body: Stack(children: [
+          SingleChildScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              children: [
+                SizedBox(
+                  key: _sectionKeys[0],
+                  height: screenSize.height - kToolbarHeight,
+                  child: HeroSection(
+                    isMobile: isMobile,
+                    scrollToSection: _scrollToSection,
+                  ),
+                ),
+                SizedBox(
+                    key: _sectionKeys[1],
+                    height: screenSize.height - kToolbarHeight,
+                    child: ContactSection(
+                      isMobile: isMobile,
+                    )),
+                SizedBox(
+                  key: _sectionKeys[2],
+                  height: screenSize.height - kToolbarHeight,
+                  child: Center(child: Text('Skills Section')),
+                ),
+                SizedBox(
+                  key: _sectionKeys[3],
+                  height: screenSize.height - kToolbarHeight,
+                  child: Center(child: Text('Project Section')),
+                ),
+                SizedBox(
+                    key: _sectionKeys[4],
+                    height: screenSize.height - kToolbarHeight,
+                    child: ContactSection(
+                      isMobile: isMobile,
+                    )),
+              ],
+            ),
+          ),
+        ]),
       ),
-    );
+    ]);
   }
 
   // ... Rest of the widget methods (app bar, sections, etc.)
