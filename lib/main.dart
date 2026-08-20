@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:portfolio_khaing/features/screens/home_screen.dart';
 import 'package:portfolio_khaing/services/locator.dart';
@@ -35,7 +33,7 @@ class _PortfolioAppState extends State<PortfolioApp> {
       child: MaterialApp(
         title: "Khaing's Portfolio",
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.softGirlLightTheme,
+        theme: AppTheme.blueMistLightTheme,
         darkTheme: AppTheme.softGirlDarkTheme,
         themeMode: _themeMode,
         home: HomeScreen(toggleTheme: toggleTheme),

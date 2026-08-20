@@ -19,6 +19,35 @@ class AppTheme {
     ),
   );
 
+  static ThemeData blueMistLightTheme = ThemeData(
+  brightness: Brightness.light,
+  scaffoldBackgroundColor: Colors.grey.shade100,
+  primaryColor: const Color(0xFF607D8B), // blue-grey
+  cardColor: Colors.white,
+  dividerColor: Colors.blueGrey.shade200,
+  textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme).apply(
+    bodyColor: Colors.blueGrey.shade900,
+    displayColor: Colors.blueGrey.shade900,
+  ),
+  appBarTheme: AppBarTheme(
+    elevation: 0,
+    backgroundColor: Colors.blueGrey.shade50,
+    foregroundColor: Colors.blueGrey.shade900,
+    iconTheme: IconThemeData(color: Colors.blueGrey.shade900),
+  ),
+  colorScheme: ColorScheme.light(
+    primary: Colors.blueGrey.shade600,
+    secondary: Colors.indigo.shade300,
+    background: Colors.grey.shade100,
+    surface: Colors.white,
+    onPrimary: Colors.white,
+    onSecondary: Colors.white,
+    onBackground: Colors.blueGrey.shade900,
+    onSurface: Colors.blueGrey.shade900,
+  ),
+);
+
+
   static ThemeData softGirlDarkTheme = ThemeData(
     brightness: Brightness.dark,
     primaryColor: const Color(0xFF9E77ED), // Violet (main in dark)
